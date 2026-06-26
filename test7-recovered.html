@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tecno Soft Academy - Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #00f260;
+            --secondary: #0575e6;
+            --dark: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --correct: #00f260;
+            --wrong: #ff0055;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #121212 100%);
+        }
+
+        /* --- Header --- */
+        header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- Quiz Container --- */
+        .quiz-container {
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .score-box {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        /* --- Question Section --- */
+        .question-box {
+            margin-bottom: 2rem;
+            min-height: 100px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .arabic-text {
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+            display: none;
+            color: var(--primary);
+        }
+
+        /* --- Options --- */
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            color: var(--text-main);
+            cursor: pointer;
+            text-align: left;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option-btn:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+            border-color: var(--secondary);
+        }
+
+        .option-btn.correct {
+            background: rgba(0, 242, 96, 0.2);
+            border-color: var(--correct);
+            color: var(--correct);
+        }
+
+        .option-btn.wrong {
+            background: rgba(255, 0, 85, 0.2);
+            border-color: var(--wrong);
+            color: var(--wrong);
+            animation: shake 0.5s;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* --- Footer Controls --- */
+        .quiz-footer {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .translate-btn {
+            background: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .translate-btn:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .next-btn {
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: none; /* Hidden initially */
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 242, 96, 0.4);
+        }
+
+        /* --- Result Screen --- */
+        .result-screen {
+            text-align: center;
+            display: none;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .final-score {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .restart-btn {
+            background: var(--wrong);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .fade-in {
+            animation: popIn 0.4s ease forwards;
+        }
+
+        /* --- Progress Bar --- */
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,0.1);
+            margin-top: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><i class="fas fa-graduation-cap"></i> Tecno Soft Academy</div>
+    </header>
+
+    <!-- Audio Effects -->
+    <audio id="correctSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+    <audio id="wrongSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
+
+    <div class="quiz-container fade-in">
+        
+        <!-- Quiz Screen -->
+        <div id="quiz-screen">
+            <div class="quiz-header">
+                <span class="progress-text" id="question-count">Question 1/5</span>
+                <div class="score-box">Score: <span id="current-score">0</span></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <div class="question-box">
+                <h3 class="question-text en" id="q-text">Loading...</h3>
+                <h3 class="question-text arabic-text" id="q-text-ar">Loading...</h3>
+            </div>
+
+            <ul class="options-list" id="options-container">
+                <!-- Options injected via JS -->
+            </ul>
+
+            <div class="quiz-footer">
+                <button class="translate-btn" onclick="toggleLanguage()">
+                    <i class="fas fa-language"></i> <span id="trans-btn-text">Translate</span>
+                </button>
+                <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="result-screen">
+            <i class="fas fa-trophy result-icon"></i>
+            <h2 class="final-score">You Scored <span id="final-score-val">0</span>/5</h2>
+            <p class="en" id="result-msg">Great job! You are a WordPress Master.</p>
+            <p class="arabic-text" id="result-msg-ar">أحسنت! أنت خبير في ووردبريس.</p>
+            
+            <button class="restart-btn" onclick="restartQuiz()">
+                <i class="fas fa-redo"></i> Restart Quiz
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Data ---
+        const questions = [
+            {
+                en: {
+                    q: "What is WordPress primarily used for?",
+                    options: ["Video Editing", "Content Management System (CMS)", "Antivirus Software", "Operating System"],
+                    correct: 1
+                },
+                ar: {
+                    q: "ما هو الاستخدام الأساسي لووردبريس؟",
+                    options: ["تحرير الفيديو", "نظام إدارة المحتوى (CMS)", "برنامج مكافحة فيروسات", "نظام تشغيل"],
+                    correct: 1
+                }
+            },
+            {
+                en: {
+                    q: "Which of the following describes a 'Domain'?",
+                    options: ["The physical server storing files", "The website's address (URL)", "The design template", "The database password"],
+                    correct: 1
+                },
+                ar: {
+                    q: "أي مما يلي يصف 'الدومين'؟",
+                    options: ["الخادم المادي لتخزين الملفات", "عنوان الموقع (URL)", "قالب التصميم", "كلمة مرور قاعدة البيانات"],
+                    correct: 1
+                }
+            },
+            {
+                en: {
+                    q: "What service does InfinityFree offer?",
+                    options: ["Paid Hosting only", "Free Web Hosting", "Domain Registration only", "Graphic Design"],
+                    correct: 1
+                },
+                ar: {
+                    q: "ما هي الخدمة التي يقدمها InfinityFree؟",
+                    options: ["استضافة مدفوعة فقط", "استضافة ويب مجانية", "تسجيل نطاقات فقط", "تصميم جرافيك"],
+                    correct: 1
+                }
+            },
+            {
+                en: {
+                    q: "What is the main function of a Plugin?",
+                    options: ["To change the website colors", "To add new functionality/features", "To delete the website", "To host the website"],
+                    correct: 1
+                },
+                ar: {
+                    q: "ما هي الوظيفة الرئيسية للإضافة (Plugin)؟",
+                    options: ["لتغيير ألوان الموقع", "لإضافة وظائف وميزات جديدة", "لحذف الموقع", "لاستضافة الموقع"],
+                    correct: 1
+                }
+            },
+            {
+                en: {
+                    q: "Which tool allows you to design pages using Drag-and-Drop?",
+                    options: ["Elementor", "Photoshop", "Notepad", "Excel"],
+                    correct: 0
+                },
+                ar: {
+                    q: "أي أداة تتيح لك تصميم الصفحات باستخدام السحب والإفلات؟",
+                    options: ["إليمنتور (Elementor)", "فوتوشوب", "المفكرة", "إكسل"],
+                    correct: 0
+                }
+            }
+        ];
+
+        // --- State ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isArabic = false;
+
+        // --- DOM Elements ---
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const qText = document.getElementById('q-text');
+        const qTextAr = document.getElementById('q-text-ar');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const questionCount = document.getElementById('question-count');
+        const currentScoreEl = document.getElementById('current-score');
+        const progressFill = document.getElementById('progress-fill');
+        
+        // --- Audio ---
+        const correctSound = document.getElementById('correctSound');
+        const wrongSound = document.getElementById('wrongSound');
+        const winSound = document.getElementById('winSound');
+
+        // --- Functions ---
+
+        function loadQuestion() {
+            const q = questions[currentQuestionIndex];
+            const langData = isArabic ? q.ar : q.en;
+
+            // Update Text
+            qText.textContent = langData.q;
+            qTextAr.textContent = langData.q;
+            
+            // Update UI
+            questionCount.textContent = `Question ${currentQuestionIndex + 1}/${questions.length}`;
+            progressFill.style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
+            nextBtn.style.display = 'none';
+
+            // Clear Options
+            optionsContainer.innerHTML = '';
+
+            // Generate Options
+            langData.options.forEach((opt, index) => {
+                const li = document.createElement('li');
+                li.className = 'option-btn';
+                li.innerHTML = `<span>${opt}</span> <i class="far fa-circle"></i>`;
+                li.onclick = () => checkAnswer(index, li);
+                optionsContainer.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selectedIndex, element) {
+            // Prevent multiple clicks
+            const allOptions = optionsContainer.children;
+            for (let opt of allOptions) {
+                opt.classList.add('disabled');
+            }
+
+            const currentQ = questions[currentQuestionIndex];
+            const correctIndex = isArabic ? currentQ.ar.correct : currentQ.en.correct;
+
+            if (selectedIndex === correctIndex) {
+                // Correct
+                element.classList.add('correct');
+                element.querySelector('i').className = 'fas fa-check-circle';
+                score++;
+                currentScoreEl.textContent = score;
+                correctSound.play();
+            } else {
+                // Wrong
+                element.classList.add('wrong');
+                element.querySelector('i').className = 'fas fa-times-circle';
+                // Highlight correct one
+                allOptions[correctIndex].classList.add('correct');
+                allOptions[correctIndex].querySelector('i').className = 'fas fa-check-circle';
+                wrongSound.play();
+            }
+
+            nextBtn.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizScreen.style.display = 'none';
+            resultScreen.style.display = 'block';
+            document.getElementById('final-score-val').textContent = score;
+            
+            if(score === questions.length) {
+                winSound.play();
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            currentScoreEl.textContent = '0';
+            resultScreen.style.display = 'none';
+            quizScreen.style.display = 'block';
+            loadQuestion();
+        }
+
+        function toggleLanguage() {
+            isArabic = !isArabic;
+            const btnText = document.getElementById('trans-btn-text');
+            
+            if (isArabic) {
+                btnText.textContent = "English";
+                qText.style.display = 'none';
+                qTextAr.style.display = 'block';
+                // Reload current question with new language
+                loadQuestion();
+            } else {
+                btnText.textContent = "Translate";
+                qText.style.display = 'block';
+                qTextAr.style.display = 'none';
+                loadQuestion();
+            }
+        }
+
+        // --- Init ---
+        window.onload = loadQuestion;
+
+    </script>
+</body>
+</html>
